@@ -6,10 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
+    "@prisma/extension-accelerate": "^2.0.2",
     "@stackframe/stack": "^2.8.41",
     "lucide-react": "^0.545.0",
     "next": "15.5.2",
@@ -26,6 +31,7 @@
     "eslint-config-next": "15.5.2",
     "prisma": "^6.17.1",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
