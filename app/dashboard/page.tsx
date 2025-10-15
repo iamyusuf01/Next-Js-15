@@ -3,6 +3,7 @@ import Sidebar from "../components/sidebar";
 import { getCurrentUser } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { Prisma } from "@prisma/client";
+import ProductChart from "../components/product-chart";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -29,6 +30,35 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
     take: 5,
   });
+
+  const now = new Date();
+
+  const weeklyProductData = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 1 * 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekLable = `${String(weekStart.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}/${String(weekStart.getDate() + 1).padStart(2, "0")}`;
+
+    const weekProducts = allProduct.filter((product) => {
+      const productDate = new Date(product.createdAt);
+      return productDate >= weekStart && productDate <= weekEnd;
+    });
+
+    weeklyProductData.push({
+      week: weekLable,
+      product: weekProducts.length,
+    });
+  }
 
   console.log(totalValue);
   return (
@@ -97,12 +127,22 @@ export default async function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Inventory Over Time */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2>New product per week</h2>
+            </div>
+            <div className="h-48">
+              <ProductChart data={weeklyProductData} />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* {Stock Level} */}
           <div className="bg-white rounded-lg border border-gray200 p6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between m-6">
               <h2 className="text-lg font-semibold text-gray-900">
                 Stoke Levels
               </h2>
@@ -122,17 +162,30 @@ export default async function DashboardPage() {
                   "text-green-600",
                 ];
                 return (
-                  <div key={key}>
-                    <div>
-                      <div className={`w-3 h-3 rounded-full ${bgColor}`}/>
-                      <span>{product.name}</span>
+                  <div
+                    key={key}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-3 h-3 rounded-full ${bgColor[stockLevel]}`}
+                      />
+                      <span className="text-sm font-medium text-gray-900">
+                        {product.name}
+                      </span>
                     </div>
-                    <div>{product.quantity} Units</div>
+                    <div
+                      className={`text-sm font-medium ${textColor[stockLevel]}`}
+                    >
+                      {product.quantity} Units
+                    </div>
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Effenciency */}
         </div>
       </main>
     </div>
