@@ -25,6 +25,21 @@ export default async function DashboardPage() {
     0
   );
 
+  const inStockCount = allProduct.filter((p) => Number(p.quantity) > 5).length;
+  const lowStockCount = allProduct.filter(
+    (p) => Number(p.quantity) <= 5 && Number(p.quantity) >= 1
+  ).length;
+  const outOfStockCount = allProduct.filter(
+    (p) => Number(p.quantity) > 5
+  ).length;
+
+  const inStockPercentage =
+    totalProduct > 0 ? Math.round((inStockCount / totalProduct) * 100) : 0;
+  const lowStockPercentage =
+    totalProduct > 0 ? Math.round((lowStockCount / totalProduct) * 100) : 0;
+  const outOfStockPercentage =
+    totalProduct > 0 ? Math.round((outOfStockCount / totalProduct) * 100) : 0;
+
   const recent = await prisma.product.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -36,7 +51,7 @@ export default async function DashboardPage() {
   const weeklyProductData = [];
 
   for (let i = 11; i >= 0; i--) {
-    const weekStart = new Date();
+    const weekStart = new Date(now);
     weekStart.setDate(weekStart.getDate() - 1 * 7);
     weekStart.setHours(0, 0, 0, 0);
 
@@ -185,7 +200,54 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Effenciency */}
+          {/* Effinciency */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6 ">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {" "}
+                Efficiency
+              </h2>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="relative w-48 h-48">
+                <div
+                  className="absolute inset-0 rounded-full border-8 border-purple-600"
+                  style={{
+                    clipPath:
+                      "polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 50%)",
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">
+                      {inStockPercentage}%
+                    </div>
+                    <div className="text-sm text-gray-600">In Stock</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 space-y-2">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-2000" />
+                  <span>In Stock ({inStockPercentage}%)</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-2000" />
+                    <span>Low Stock ({lowStockPercentage}%)</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-gray-2000" />
+                    <span>Out Stock ({outOfStockPercentage}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
