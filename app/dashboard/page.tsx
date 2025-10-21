@@ -146,7 +146,7 @@ export default async function DashboardPage() {
           {/* Inventory Over Time */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2>New product per week</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">New product per week</h2>
             </div>
             <div className="h-48">
               <ProductChart data={weeklyProductData} />
